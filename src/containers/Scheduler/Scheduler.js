@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Glyphicon,Label,Panel,PanelGroup } from 'react-bootstrap';
+import axios from 'axios';
 import InputPlayers from '../../components/Players/InputPlayers/InputPlayers';
 import ListTeams from '../../components/Players/ListTeams/ListTeams';
 import ScheduleBuilder from '../../components/ScheduleBuilder/ScheduleBuilder';
 
+const API_URL = "https://api.myjson.com/bins/r4ky2";
 class Scheduler extends Component {
     
     state = {
@@ -24,7 +26,7 @@ class Scheduler extends Component {
     }
 
     componentDidMount() {
-        console.log("Component Mounted");
+        console.log(API_URL);
     }
 
     componentWillReceieveProps() {
@@ -61,10 +63,27 @@ class Scheduler extends Component {
 	}
     
     handleChange(e) {
-       
+       console.log("Recieved");
+       console.log(e.target.value);
+       this.handleUpdatePlayerData(e.target.value);
+    }
+    
+    handleUpdatePlayerData(val) {
        let changeVal = {...this.state.inputVal};
-           changeVal = e.target.value;
+           changeVal = val;
        this.setState({inputVal:changeVal});
+    }
+
+    handleLoadData() {
+        axios.get(API_URL)
+             .then( res => {
+                
+                const loadData = res.data[0].value;
+                console.log(loadData);
+                this.setState({inputVal:loadData});
+
+             });
+
     }
 
 
@@ -99,7 +118,7 @@ class Scheduler extends Component {
            teamsState[i] = {id:i+1,name:arr1[i]+' & '+arr2[i]};
         }
         this.setState({teams:teamsState});
-        this.handleSelect(2);
+        this.handleSelect("2");
 	}
     
 
@@ -118,11 +137,12 @@ class Scheduler extends Component {
 
 		  }
 		}
-		console.log(add);;
         this.setState({schedule:add})
+        this.handleSelect("3");
 		
     }
   
+
 	render() {
         
 		return (
@@ -147,7 +167,11 @@ class Scheduler extends Component {
                               </Panel.Title>
                             </Panel.Heading>
                             <Panel.Body collapsible>
-                                <InputPlayers change={this.handleChange.bind(this)} click={this.handleGenerate.bind(this)} />
+                                <InputPlayers 
+                                       change={this.handleChange.bind(this)} 
+                                       click={this.handleGenerate.bind(this)} 
+                                       defaultData={this.state.inputVal}
+                                       loadData={this.handleLoadData.bind(this)} />
                             </Panel.Body>
                           </Panel>
 
