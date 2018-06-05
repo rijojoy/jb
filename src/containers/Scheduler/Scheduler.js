@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Glyphicon,Label,Panel,PanelGroup } from 'react-bootstrap';
 import InputPlayers from '../../components/Players/InputPlayers/InputPlayers';
 import ListTeams from '../../components/Players/ListTeams/ListTeams';
+import ScheduleBuilder from '../../components/ScheduleBuilder/ScheduleBuilder';
 
 class Scheduler extends Component {
     
@@ -11,7 +12,7 @@ class Scheduler extends Component {
                 },
                inputVal:'',
                teams:[],
-               test:''
+               schedule:[]
             };
     constructor(props){
        super(props)
@@ -23,7 +24,7 @@ class Scheduler extends Component {
     }
 
     componentDidMount() {
-    	console.log("Component Mounted");
+        console.log("Component Mounted");
     }
 
     componentWillReceieveProps() {
@@ -43,6 +44,7 @@ class Scheduler extends Component {
 
     componentDidUpdate() {
     	console.log("Component Did Update");
+    	console.log(this.state);
     }
 
     componentWIllUnmount() {
@@ -100,6 +102,26 @@ class Scheduler extends Component {
         this.handleSelect(2);
 	}
     
+
+    handleSchedule() {
+
+    	var teams={...this.state.teams};
+		var randomTeam=Object.keys(teams).sort(function(a,b){
+			return  0.5 - Math.random();
+		});
+		var add=[];
+		for(var i=0;i<randomTeam.length;i++){
+		  for(var j=0;j<randomTeam.length,j!=i;j++){
+		     
+		      var arr = new Array(randomTeam[i],randomTeam[j]);
+		      add.push(arr);
+
+		  }
+		}
+		console.log(add);;
+        this.setState({schedule:add})
+		
+    }
   
 	render() {
         
@@ -137,7 +159,7 @@ class Scheduler extends Component {
                               </Panel.Title>
                             </Panel.Heading>
                             <Panel.Body collapsible>
-                                <ListTeams teams={this.state.teams} />
+                                <ListTeams teams={this.state.teams} click={this.handleSchedule.bind(this)}/>
                             </Panel.Body>
                           </Panel>
 
@@ -149,6 +171,7 @@ class Scheduler extends Component {
                               </Panel.Title>
                             </Panel.Heading>
                             <Panel.Body collapsible>
+                                 <ScheduleBuilder schedule={this.state.schedule} teams={this.state.teams}/>
                             </Panel.Body>
                           </Panel>
 

@@ -1,9 +1,11 @@
 import React from 'react';
-import { Table,Label,Badge } from 'react-bootstrap';
+import { Button, Glyphicon, Table, Label, Badge } from 'react-bootstrap';
+import './ListTeams.css';
 const STYLE = ["success","danger"];
 const ListTeams = (props) => {
 
 	return (
+              <div>
               <Table responsive>
 				<thead>
 				    <tr>
@@ -32,6 +34,11 @@ const ListTeams = (props) => {
 				})}
 				</tbody>
 			   </Table>
+               <br />
+               <Button bsStyle="success Placement" onClick={props.click}> 
+                    <Glyphicon glyph="wrench" /> Create Schedule 
+               </Button>
+               </div>
 
 		   );
 }
