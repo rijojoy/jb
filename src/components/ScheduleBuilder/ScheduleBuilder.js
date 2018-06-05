@@ -9,6 +9,7 @@ const ScheduleBuilder = (props) => {
              { props.schedule.map( (v,k) => {
 
              	  return (
+                              
                               <ListGroupItem className="align-center">
 	                            <h4>
 		                            <Label bsStyle="success">  
