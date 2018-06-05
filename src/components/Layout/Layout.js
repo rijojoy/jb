@@ -1,12 +1,14 @@
 import React from 'react';
-import {Grid, Row, Col } from 'react-bootstrap';
+import {Grid, Image, PageHeader, Row, Col } from 'react-bootstrap';
 
 const Layout = (props) => {
 
 	return (
               <Grid>
 	              <header>
-	               <h1> Tournament Scheduler </h1>
+	              <PageHeader>
+                   <Image src="/jb.jpg" responsive />
+                  </PageHeader>
 	              </header>
 	              <main>
               		{props.children}
