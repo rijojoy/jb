@@ -7,7 +7,7 @@ const Layout = (props) => {
               <Grid>
 	              <header>
 	              <PageHeader>
-                   <Image src="/jb.jpg" responsive />
+                   <Image src="/JB.jpg" responsive />
                   </PageHeader>
 	              </header>
 	              <main>
