@@ -1,20 +1,24 @@
 import React, { Component } from 'react';
 import { Glyphicon,Label,Panel,PanelGroup } from 'react-bootstrap';
-import axios from 'axios';
 import InputPlayers from '../../components/Players/InputPlayers/InputPlayers';
 import ListTeams from '../../components/Players/ListTeams/ListTeams';
 import ScheduleBuilder from '../../components/ScheduleBuilder/ScheduleBuilder';
+import axios from '../../axios';
+import Loader from '../../components/UI/Loader/Loader';
 
-const API_URL = "https://api.myjson.com/bins/r4ky2";
 class Scheduler extends Component {
     
     state = {
                manageSteps: {
                 	activeStep: '1'
                 },
-               inputVal:'',
+               loading:false,
+               newVal:'',
+               gameType:1,
+               inputVal:[],
                teams:[],
                schedule:[]
+
             };
     constructor(props){
        super(props)
@@ -26,19 +30,20 @@ class Scheduler extends Component {
     }
 
     componentDidMount() {
-        console.log(API_URL);
+        console.log("Component Mounted");
     }
 
     componentWillReceieveProps() {
     	console.log("Recieved Props");
     }
 
-   /*shouldComponentUpdate(nextProps,nextState) {
-    	console.log(nextProps);
-    	console.log(nextState);
+   shouldComponentUpdate(nextProps,nextState) {
+      if (this.state.newVal == nextState.newVal) {
+      return true;
+      }
     	return true;
     }
-    */
+  
    
     componentWillUpdate() {
     	console.log("Component Will Update");
@@ -62,50 +67,84 @@ class Scheduler extends Component {
 
 	}
     
-    handleChange(e) {
-       console.log("Recieved");
-       console.log(e.target.value);
-       this.handleUpdatePlayerData(e.target.value);
+  handleChange(e) {
+     console.log("Recieved");
+     this.handleUpdatePlayerData(e.target.id,e.target.value);
+  }
+
+  handleChangeNewVal(e) {
+    this.setState({newVal:e.target.value});
+  }
+
+  handleChangeGameType(e) {
+
+         this.setState({gameType:e.target.value});
+  }
+
+  handleAddNewPlayer() {
+    if(this.state.newVal != '') {
+
+      let newVal = {...this.state.inputVal};
+        //newVal.push(this.state.newVal);
+      let newK = Object.keys(newVal).length;
+      newVal[newK] = {"name":this.state.newVal};
+      this.setState({inputVal:newVal,newVal:''});
+
     }
     
-    handleUpdatePlayerData(val) {
-       let changeVal = {...this.state.inputVal};
-           changeVal = val;
-       this.setState({inputVal:changeVal});
-    }
+  }
+  
+  handleRemovePlayer(e) {
+     let objId = e.target.id;
+     let playerVals = {...this.state.inputVal};
+     delete playerVals[objId];
+     console.log(playerVals);
+     this.setState({inputVal:playerVals});
 
-    handleLoadData() {
-        axios.get(API_URL)
-             .then( res => {
-                
-                const loadData = res.data[0].value;
-                console.log(loadData);
-                this.setState({inputVal:loadData});
+  }
+  handleUpdatePlayerData(id,val) {
+     console.log("Updating")
+     let changeVal = {...this.state.inputVal};
+         changeVal[id].name = val;
+     this.setState({inputVal:changeVal});
+     console.log(this.state.inputVal);
+  }
 
-             });
+  handleLoadData() {
+      this.setState({loading:true});
+      axios.get("members.json")
+           .then( res => {
+              
+              const loadData = res.data;
+              this.setState({inputVal:loadData,loading:false});
 
-    }
+           });
+
+  }
 
 
 	handleGenerate() {
     
         
-        const entries = this.state.inputVal.split("\n");
+        const entries = this.state.inputVal;
         let arr1 = [];
         let arr2 = [];
-        if(entries.length%2 != 0)
+        let obToArr = Object.keys(entries);
+        if(obToArr.length%2 != 0)
         {
-        	entries.push("bye");
+        	let obKey = obToArr.length;
+          entries[obKey] = {"name":"bye"};
         }
-        const entryLength = entries.length;
-
-        entries.forEach( (val,key) => {
+        obToArr = Object.keys(entries);
+        const entryLength = obToArr.length;
+        
+        obToArr.forEach( (val,key) => {
           
            if(key+1 <= entryLength/2){
-           	 arr1.push(val);
+           	 arr1.push(entries[key]);
            }
            else{
-           	 arr2.push(val);
+           	 arr2.push(entries[key]);
            }
                    
         });
@@ -115,36 +154,60 @@ class Scheduler extends Component {
         let teamsState = {...this.state.teams};
         for(var i=0; i<entryLength/2; i++)
         {
-           teamsState[i] = {id:i+1,name:arr1[i]+' & '+arr2[i]};
+           teamsState[i] = {id:i+1,name:arr1[i].name+' & '+arr2[i].name};
         }
         this.setState({teams:teamsState});
         this.handleSelect("2");
 	}
     
 
-    handleSchedule() {
+  handleSchedule() {
 
-    	var teams={...this.state.teams};
+    var teams={...this.state.teams};
 		var randomTeam=Object.keys(teams).sort(function(a,b){
 			return  0.5 - Math.random();
 		});
 		var add=[];
-		for(var i=0;i<randomTeam.length;i++){
-		  for(var j=0;j<randomTeam.length,j!=i;j++){
-		     
-		      var arr = new Array(randomTeam[i],randomTeam[j]);
-		      add.push(arr);
+    if(this.state.gameType == 2) {
 
-		  }
-		}
-        this.setState({schedule:add})
-        this.handleSelect("3");
-		
+      for(let i=0;i<randomTeam.length;i++){
+        for(let j=0;j<randomTeam.length,j!=i;j++){
+           
+            let arr = new Array(randomTeam[i],randomTeam[j]);
+            add.push(arr);
+
+        }
+      }
     }
+    else {
+      for(let i=0;i<randomTeam.length;i++){
+            let arr = new Array(randomTeam[i],randomTeam[i+1]);
+            add.push(arr);
+            i = i+1;
+      }
+      console.log(add);
+    }
+		
+    this.setState({schedule:add})
+    this.handleSelect("3");
+	
+  }
   
 
 	render() {
-        
+    let inputPlayers = <Loader />
+    
+    if(!this.state.loading) {
+         inputPlayers =  <InputPlayers 
+                                       change={this.handleChange.bind(this)}
+                                       changeNewVal={this.handleChangeNewVal.bind(this)}
+                                       click={this.handleGenerate.bind(this)} 
+                                       defaultData={this.state.inputVal}
+                                       newVal={this.state.newVal}
+                                       add={this.handleAddNewPlayer.bind(this)}
+                                       remove={this.handleRemovePlayer.bind(this)}
+                                       loadData={this.handleLoadData.bind(this)} />
+        }   
 		return (
                   <Panel bsStyle="info">
                     <Panel.Heading> 
@@ -167,11 +230,7 @@ class Scheduler extends Component {
                               </Panel.Title>
                             </Panel.Heading>
                             <Panel.Body collapsible>
-                                <InputPlayers 
-                                       change={this.handleChange.bind(this)} 
-                                       click={this.handleGenerate.bind(this)} 
-                                       defaultData={this.state.inputVal}
-                                       loadData={this.handleLoadData.bind(this)} />
+                                {inputPlayers}
                             </Panel.Body>
                           </Panel>
 
@@ -183,7 +242,11 @@ class Scheduler extends Component {
                               </Panel.Title>
                             </Panel.Heading>
                             <Panel.Body collapsible>
-                                <ListTeams teams={this.state.teams} click={this.handleSchedule.bind(this)}/>
+                                <ListTeams 
+                                      teams={this.state.teams} 
+                                      click={this.handleSchedule.bind(this)}
+                                      change={this.handleChangeGameType.bind(this)}
+                                      />
                             </Panel.Body>
                           </Panel>
 
@@ -195,7 +258,10 @@ class Scheduler extends Component {
                               </Panel.Title>
                             </Panel.Heading>
                             <Panel.Body collapsible>
-                                 <ScheduleBuilder schedule={this.state.schedule} teams={this.state.teams}/>
+                                 <ScheduleBuilder 
+                                       schedule={this.state.schedule} 
+                                       teams={this.state.teams}
+                                      />
                             </Panel.Body>
                           </Panel>
 

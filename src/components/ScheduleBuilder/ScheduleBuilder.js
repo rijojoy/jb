@@ -1,33 +1,40 @@
 import React from 'react';
 import './ScheduleBuilder.css';
-import { Badge,Glyphicon,Label,ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Badge, Glyphicon, Label, ListGroup, Panel, ListGroupItem, Row, Col } from 'react-bootstrap';
 
 const ScheduleBuilder = (props) => {
-
+    console.log(props.schedule);
+    console.log(props.teams);
 	return (
-             <ListGroup>
+             <Row>
              { props.schedule.map( (v,k) => {
 
              	  return (
-                              
-                              <ListGroupItem className="align-center">
-	                            <h4>
-		                            <Label bsStyle="success">  
-		                              <Glyphicon glyph="user" /><Glyphicon glyph="user" /> {props.teams[v[0]].name} 
-		                            </Label>
-		                            	<Badge className="custom-margin"> VS </Badge>
-		                            <Label bsStyle="danger">
-		                              <Glyphicon glyph="user" /><Glyphicon glyph="user" /> {props.teams[v[1]].name}
-		                            </Label>
-	                            </h4>
+                                <Col md={2} sm={2} lg={2}>
+	                              <Panel style={{"margin":"2px"}}>
+								    <Panel.Heading>Game {k+1}</Panel.Heading>
+								    <Panel.Body>
+	                                    <Label bsStyle="success">  
+			                              <Glyphicon glyph="user" /><Glyphicon glyph="user" /> {props.teams[v[0]].name} 
+			                            </Label>
+			                            	<Badge className="custom-margin"> VS </Badge>
+			                            <Label bsStyle="danger">
+			                              <Glyphicon glyph="user" /><Glyphicon glyph="user" /> {props.teams[v[1]].name}
+			                            </Label>
+								    </Panel.Body>
+								  </Panel>
+								</Col>
+                                  
+								
 
-                              </ListGroupItem>
+                              
+
              	  	     )
              }
                                 
 
              )}
-             </ListGroup>
+            </Row>
 		   );
 }
 
