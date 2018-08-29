@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { FieldGroup, Button, FormControl } from 'react-bootstrap';
 import sgMail from '@sendgrid/mail';
-import axios-sg from '../../axios-sendgrid';
+import axiossg from '../../axios-sendgrid';
 
 class contact extends Component {
     
@@ -51,7 +51,7 @@ class contact extends Component {
 					  }
 				});
 
-        axios-sg.post(msg)
+        axiossg.post(msg)
            .then( res => {
               
               console.log(res);

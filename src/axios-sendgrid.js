@@ -6,7 +6,8 @@ const instance = axios.create({
      withCredentials: true,
      headers: {
      	         'authorization': 'Bearer '+process.env.REACT_APP_SENDGRID_API_KEY,
-                 'content-type' : "application/json"
+                 'content-type' : "application/json",
+                 'Access-Control-Allow-Origin': '*'
      	     }
     
 });
